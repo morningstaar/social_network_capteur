@@ -2,115 +2,37 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Biofeedback Video Feed</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
-        
-        /* Conteneur principal qui va scroller */
-        #feed { 
-            height: 100vh; 
-            overflow-y: scroll; 
-            scroll-behavior: smooth;
-            transition: filter 0.4s ease, opacity 0.4s ease;
-        }
-
-        /* Style des cartes vidéo */
-        .video-card {
-            position: relative;
-            height: 90vh; /* Chaque vidéo prend presque tout l'écran */
-            margin: 20px auto;
-            width: 90%;
-            max-width: 500px;
-            background: #111;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .label {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        /* Effet de surcharge physiologique (Etape 3) */
-        .overloaded { 
-            filter: blur(15px) brightness(0.5); 
-            pointer-events: none; 
-        }
-
-        #status {
-            position: fixed; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px; border-radius: 50px;
-            z-index: 1000; border: 1px solid rgba(255,255,255,0.2);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biofeedback Social Feed</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 
-    <div id="status">EDA : <span id="eda-val">0</span></div>
+    <div id="overlay">
+        <button id="start-btn">DÉMARRER L'EXPÉRIENCE</button>
+    </div>
+
+    <div id="status">
+        <span class="label-tech">ACTIVITÉ ÉLECTRODERMALE</span>
+        <span id="eda-val">0</span> <span class="unit">/ 1024</span>
+    </div>
 
     <div id="feed">
         <div class="video-card">
-            <video src="./assets/videos/1.mp4" autoplay loop muted></video>
-            <div class="label">Contenu Calme 🌿</div>
+            <video src="./assets/videos/1.mp4" loop muted playsinline></video>
+            <div class="video-label">Contenu Calme 🌿</div>
         </div>
-
         <div class="video-card">
-            <video src="./assets/videos/1.mp4" autoplay loop muted></video>
-            <div class="label">Contenu Stressant ⚡</div>
+            <video src="./assets/videos/1.mp4" loop muted playsinline></video>
+            <div class="video-label">Contenu Stressant ⚡</div>
         </div>
-
         <div class="video-card">
-            <video src="./assets/videos/1.mp4" autoplay loop muted></video>
-            <div class="label">Flux d'Information 🗞️</div>
-        </div>
-
-        <div class="video-card">
-            <video src="./assets/videos/1.mp4" autoplay loop muted></video>
-            <div class="label">Contenu Apaisant 🌊</div>
+            <video src="./assets/videos/1.mp4" loop muted playsinline></video>
+            <div class="video-label">Flux d'Information 🗞️</div>
         </div>
     </div>
 
-    <script>
-        const socket = io();
-        const feed = document.getElementById('feed');
-        const edaDisplay = document.getElementById('eda-val');
-        
-        const THRESHOLD = 600; // Ton seuil d'alerte
-
-        socket.on('eda-data', (value) => {
-            edaDisplay.innerText = value;
-
-            // Logique de scrolling : plus la valeur EDA est haute, plus ça défile
-            // On divise par 40 pour avoir un mouvement fluide et pas trop violent
-            if (value > 100) { 
-                feed.scrollTop += (value / 40);
-            }
-
-            // Logique de rétroaction (Flou)
-            if (value > THRESHOLD) {
-                feed.classList.add('overloaded');
-            } else {
-                feed.classList.remove('overloaded');
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
