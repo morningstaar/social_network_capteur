@@ -1,35 +1,5 @@
 import platform
 import sys
-import socketio
-import plux
-# ... (gardez vos imports et la détection d'OS)
-
-sio = socketio.Client()
-
-class NewDevice(plux.SignalsDev):
-    def __init__(self, address):
-        super().__init__(address)
-        self.duration = 10000 # Longue durée pour le test
-        self.frequency = 100 
-
-    def onRawFrame(self, nSeq, data):
-        # On extrait la valeur EDA (souvent sur le port 1, index 0 de 'data')
-        eda_value = data[0] 
-        
-        # Envoi de la donnée via Socket.io toutes les 10 frames pour ne pas saturer
-        if nSeq % 10 == 0:
-            sio.emit('sensor_data', {'value': eda_value})
-            print(f"Envoi EDA: {eda_value}")
-        
-        return False # Continue l'acquisition
-
-# Connexion au serveur de l'interface
-try:
-    sio.connect('http://localhost:3000') # Remplacez par votre URL de serveur
-except:
-    print("Serveur non trouvé, vérifiez que le serveur Node/Python tourne.")
-
-# Lancez l'acquisition normalement ensuite
 
 osDic = {
     "Darwin": f"MacOS/Intel{''.join(platform.python_version().split('.')[:2])}",
