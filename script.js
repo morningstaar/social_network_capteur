@@ -1,48 +1,24 @@
-let socket;
-try {
-    socket = io(); // Tente de se connecter au serveur Node
-} catch (e) {
-    console.log("Mode simulation clavier activé.");
-}
+const socket = io('http://localhost:3000'); // Connexion au serveur
 
 const edaDisplay = document.getElementById('eda-val');
-const videoCards = document.querySelectorAll('.video-card');
-const startBtn = document.getElementById('start-btn');
-const overlay = document.getElementById('overlay');
 
-let fakeEDA = 0; 
-const THRESHOLD = 600;
+// Réception des données du capteur
+socket.on('sensor_data', (data) => {
+    // Mise à jour de la valeur dans le HTML
+    edaDisplay.innerText = data.value;
 
-// 1. Démarrage
-startBtn.addEventListener('click', () => {
-    overlay.style.display = 'none';
-    document.querySelectorAll('video').forEach(v => {
-        v.play().catch(err => console.log("Auto-play bloqué par le navigateur"));
-    });
+    // Optionnel : Changer la couleur si le stress monte (ex: > 500)
+    if(data.value > 500) {
+        edaDisplay.style.color = "red";
+    } else {
+        edaDisplay.style.color = "#00ff88";
+    }
 });
 
-// 2. Mise à jour visuelle (Fonction commune)
-function updateUI(value) {
-    edaDisplay.innerText = value;
-    videoCards.forEach(card => {
-        if (value > THRESHOLD) {
-            card.classList.add('overloaded');
-        } else {
-            card.classList.remove('overloaded');
-        }
-    });
-}
-
-// 3. Test Clavier (Flèches Haut/Bas)
-window.addEventListener('keydown', (e) => {
-    if (e.key === "ArrowUp") fakeEDA = Math.min(1024, fakeEDA + 50);
-    if (e.key === "ArrowDown") fakeEDA = Math.max(0, fakeEDA - 50);
-    updateUI(fakeEDA);
+// Gestion du bouton démarrer
+document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('overlay').style.display = 'none';
+    // Lancer la lecture des vidéos ici
+    const videos = document.querySelectorAll('video');
+    videos.forEach(v => v.play());
 });
-
-// 4. Réception données réelles (BITalino)
-if (socket) {
-    socket.on('eda-data', (value) => {
-        updateUI(value);
-    });
-}
